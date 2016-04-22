@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+#抓取糗事百科的简单爬虫
+#只抓取点赞超过一百的段子
 
 import urllib
 import urllib2
