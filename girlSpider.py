@@ -98,7 +98,7 @@ class GirlSpider(object):
             print str(e)
     
     def mkdir(self, path):
-        path = path.strip().replace("*", "")
+        path = path.strip()
         import os
         if not os.path.exists(path):
             os.makedirs(path)
@@ -128,6 +128,7 @@ class GirlSpider(object):
                         img_list = self.getIMGList(img_page)
                         for img in img_list:
                             path = second_part
+                            path = path.replace("*", "")
                             self.mkdir(path)
                             img__file_name = path + str(uuid.uuid4()) + ".jpg"
                             print u'正在下载图片' +  str(count)
