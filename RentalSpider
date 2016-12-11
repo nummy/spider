@@ -1,0 +1,110 @@
+# coding:utf-8
+import requests
+import MySQLdb
+from bs4 import BeautifulSoup
+
+
+class RentalSpider(object):
+	def __init__(self):
+		self.base_url = "https://www.douban.com/group/huangpuzufang/discussion?start="
+		self.page = 1
+		self.total = 0
+		self.content = []
+		self.pages = []
+		self.db = None
+		self.cursor = None
+		self.init_db()
+
+	def init_db(self):
+		self.db = MySQLdb.connect("localhost","root","","spider",charset="utf8")
+		self.cursor = self.db.cursor()
+
+	def getPage(self,url=None,index=0):
+		try:
+			if not url:
+				url = self.base_url + str(index)
+			headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}
+			proxies={"http":"http://210.14.135.24:80"}
+			res = requests.get(url,proxies=proxies ,headers=headers)
+			return res.text
+		except Exception as e:
+			print e
+			return None
+
+	def getSubject(self, soup):
+		links = soup.find_all("td", class_="title")
+		for link in links:
+			url = link.a["href"]
+			title = link.a["title"] 
+			print url
+			self.getContents(url)
+			sql = """INSERT INTO subject(url, title) VALUES ("%s","%s")""" % (url,title)
+			try:
+				self.cursor.execute(sql)
+				self.db.commit()
+			except Exception as e:
+				print e
+				self.db.rollback()
+
+	def getContents(self,url):
+		page = self.getPage(url)
+		soup = BeautifulSoup(page, "lxml")
+		title = soup.h1.string
+		span = soup.find("span",class_="from")
+		if span is None:
+			return
+		author = span.a.string
+		dt = soup.find("div", class_="topic-doc").find("h3").find("span", class_="color-green").string
+		p = soup.find("div", id="link-report").p
+		if p is None:
+			return
+		contents = p.strings
+		contents = list(contents)
+		contents = "\n".join(contents)
+		contents.replace("\"","")
+		sql = """insert into article(url,title,author,content,datetime) 
+		values("%s","%s","%s","%s","%s")""" % (url,title,author,contents,dt)
+		print sql
+		try:
+			self.cursor.execute(sql)
+			self.db.commit()
+		except Exception as e:
+			print e
+			self.db.rollback()
+
+	def getPages(self, soup):
+		paginators = soup.find("div", class_="paginator")
+		links = paginators.select("a")
+		urls  = [] 
+		for link in links:
+			urls.append(link["href"])
+		return urls
+
+	def close_db(self):
+		self.db.close()
+
+	def empty_table(self):
+		sql = "delete from subject;delete from article"
+		try:
+			self.cursor.execute(sql)
+		except Exception as e:
+			print e
+
+
+	def start(self):
+		self.empty_table()
+		page = self.getPage()
+		print page
+		soup = BeautifulSoup(page, "lxml")
+		self.getSubject(soup)
+		pages = self.getPages(soup)
+		for page in pages:
+			current_page = self.getPage(url=page)
+			current_soup = BeautifulSoup(current_page, "lxml")
+			self.getSubject(current_soup)
+		self.close_db()
+
+
+if __name__ == '__main__':
+	spider = RentalSpider()
+	spider.start()
