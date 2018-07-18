@@ -114,10 +114,10 @@ def get_detail(item):
 
 if __name__ == "__main__":
     create_db()
-    time = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%S")
+    time = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M")
     logger.info(u"调度开始时间:%s" % time)
     for i in range(26):
         logger.info(u"爬取第%s页数据" % i)
         get_page(i*50)
-    time = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%S")
+    time = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M")
     logger.info(u"调度结束时间:%s" % time)
