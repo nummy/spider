@@ -18,7 +18,12 @@
 
 <body>
     <div class="main">
-        <table class="table table-hover" data-pagination="true" data-page-size="15" data-search="true" data-toggle="table" data-url="/topic">
+        <div id="toolbar">
+            <button id="clear" class="btn btn-danger">
+                Clear
+            </button>
+        </div>
+        <table class="table table-hover" data-pagination="true" data-page-size="15" data-search="true" data-toggle="table" data-url="/topic"  data-toolbar="#toolbar">
             <thead>
                 <tr>
                     <th data-field="id">ID</th>
@@ -43,6 +48,16 @@
     <script type="text/javascript">
         $(function(){
             $("table").bootstrapTable();
+            $("#clear").click(function(){
+                $.ajax({
+                    url:"/clear",
+                    type:"GET",
+                    contentType: "application/json",
+                    success: function(){
+                        location.reload();
+                    }
+                })
+            })
         });
         function formatter(value, row) {
             value = $.trim(value);

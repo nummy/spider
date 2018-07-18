@@ -1,5 +1,6 @@
 import sqlite3
 from flask import Flask
+from flask import request
 from flask import jsonify
 from flask import render_template
 
@@ -38,6 +39,17 @@ def get_topic():
         }
         data_lst.append(data)
     return jsonify(data_lst)
+
+@app.route("/clear")
+def clear_all():
+    conn = sqlite3.connect('python.db')
+    cursor = conn.cursor()
+    sql = "delete from topic"
+    c = cursor.execute(sql)
+    conn.commit()
+    conn.close()
+    return jsonify({})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
