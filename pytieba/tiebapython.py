@@ -67,7 +67,7 @@ def get_topic(tid):
 
 
 URL = "http://tieba.baidu.com/f?kw=python"
-filters = [u"资料", u"免费"]
+filters = [u"资料", u"免费", u"广告", u"培训", u"分享",u"资源", u"学好", u"交流", u"视频",u"教程"]
 
 def get_total():
     html = requests.get(URL).content
