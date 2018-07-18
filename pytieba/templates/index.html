@@ -2,18 +2,48 @@
 <html>
 
 <head>
-    <title>python帖子</title>
+    <title>数据可视化</title>
     <link rel="stylesheet" type="text/css" href="static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="static/bootstrap-table/bootstrap-table.css">
     <style type="text/css">
+        body{
+            margin:20 auto;
+        }
+        div.main{
+            width:95%;
+            margin: 0 auto;
+        }
     </style>
 </head>
 
 <body>
     <div class="main">
+        <table class="table table-hover" data-pagination="true" data-page-size="15" data-search="true" data-toggle="table" data-url="/topic">
+            <thead>
+                <tr>
+                    <th data-field="id">ID</th>
+                    <th data-field="title">标题</th>
+                    <th data-field="author">发布人</th>
+                    <th data-field="publish_time">发布时间</th>
+                    <th data-field="response_num">回复数</th>
+                    <th data-field="last_reply">最后回复时间</th>
+                    <th data-field="create_time">采集时间</th>
+                    <th data-field="update_time">更新时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
     </div>
-    <script type="text/javascript" src="static/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/jquery.min.js"></script>
+    <script type="text/javascript" src="static/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="static/bootstrap-table/bootstrap-table.js"></script>
+    <script type="text/javascript" src="static/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
     <script type="text/javascript">
+        $(function(){
+            $("table").bootstrapTable();
+        });
     </script>
 </body>
 </html>
