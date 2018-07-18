@@ -1,3 +1,4 @@
+#! /usr/bin/python
 # coding:utf-8
 import re
 import json
@@ -67,7 +68,11 @@ def get_topic(tid):
 
 
 URL = "http://tieba.baidu.com/f?kw=python"
-filters = [u"资料", u"免费", u"广告", u"培训", u"分享",u"资源", u"学好", u"交流", u"视频",u"教程"]
+
+filters = [u"资料", u"免费", u"广告", u"培训", u"分享",u"资源", u"心得",
+u"学好", u"交流", u"视频",u"教程",u"福音", u"心得", u"最热", u"教材", u"实战", u"进阶"]
+filter_authors = [u"qq191501000", u"飞凡5520", u"z7912846",u"啊贤哥仔"]
+
 
 def get_total():
     html = requests.get(URL).content
@@ -102,7 +107,27 @@ def get_detail(item):
         if word in title:
             return
     publish_time = item.find(class_="is_show_create_time").text.strip()
+    today = datetime.today()
+    year = today.year
+    month = today.month
+    day = today.day
+    if ":" in publish_time:
+        arr = publish_time.split(":")
+        hour = int(arr[0])
+        minute = int(arr[1])
+        publish_time = datetime(year, month, day, hour, minute).strftime("%Y-%m-%d %H:%M")
+    elif "-" in publish_time:
+        arr = publish_time.split("-")
+        if len(arr[0]) == 4:
+            year = int(arr[0])
+            month = int(arr[1])
+        else:
+            month = int(arr[0])
+            day = int(arr[1])
+        publish_time = datetime(year, month, day).strftime("%Y-%m-%d %H:%M")
     author = item.find(class_="frs-author-name").text.strip()
+    if author in filter_authors:
+        return
     response_num = item.find(class_="threadlist_rep_num").text.strip()
     last_reply = item.find(class_="threadlist_reply_date").text.strip()
     if get_topic(tid):
