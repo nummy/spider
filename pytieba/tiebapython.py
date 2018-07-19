@@ -1,5 +1,5 @@
 #! /usr/bin/python
-# coding:utf-8
+# coding:utf8
 import re
 import json
 import sqlite3
@@ -9,18 +9,20 @@ import traceback
 import logging
 from datetime import datetime
 from bs4 import BeautifulSoup
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(level = logging.INFO)
-handler = logging.FileHandler("log.txt")
+handler = logging.FileHandler("/var/local/log.txt")
 handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 def create_db():
-    conn = sqlite3.connect('python.db')
+    conn = sqlite3.connect('/var/local/python.db')
     cursor = conn.cursor()
     sql = """
     CREATE TABLE IF NOT EXISTS topic(
@@ -31,6 +33,7 @@ def create_db():
         publish_time CHAR(50),
         response_num INT,
         last_reply CHAR(50),
+        keyword CHAR(50),
         create_time TIMESTAMP default (datetime('now', 'localtime')),
         update_time TIMESTAMP default (datetime('now', 'localtime'))
     )
@@ -40,25 +43,25 @@ def create_db():
     conn.close()
 
 def insert_db(data):
-    conn = sqlite3.connect('python.db')
+    conn = sqlite3.connect('/var/local/python.db')
     cursor = conn.cursor()
     sql = """
-    INSERT INTO topic (id,title,url,author,publish_time, response_num, last_reply)
-    VALUES (?,?,?,?,?,?,?)
+    INSERT INTO topic (id,title,url,author,publish_time, response_num, last_reply, keyword)
+    VALUES (?,?,?,?,?,?,?,?)
     """
     cursor.execute(sql, data)
     conn.commit()
     conn.close()
 
 def update_db(tid, last_reply, response_num):
-    conn = sqlite3.connect('python.db')
+    conn = sqlite3.connect('/var/local/python.db')
     c = conn.cursor()
     sql = "UPDATE topic set last_reply=?, response_num=?, update_time=datetime('now', 'localtime') where id=?"
     c.execute(sql, (last_reply, response_num, tid))
     conn.close()
 
 def get_topic(tid):
-    conn = sqlite3.connect('python.db')
+    conn = sqlite3.connect('/var/local/python.db')
     c = conn.cursor()
     cursor = c.execute("SELECT * FROM topic WHERE id=%s" % tid)
     conn.commit()
@@ -66,12 +69,26 @@ def get_topic(tid):
     conn.close()
     return row
 
+def get_filters():
+    words = []
+    fp = open("/var/local/stopwords.txt", "r")
+    for line in fp:
+        line = line.strip()
+        words.append(line)
+    return words
+
+def get_blacklist():
+    words = []
+    fp = open("/var/local/blacklist.txt", "r")
+    for line in fp:
+        line = line.strip()
+        words.append(line)
+    return words
 
 URL = "http://tieba.baidu.com/f?kw=python"
 
-filters = [u"资料", u"免费", u"广告", u"培训", u"分享",u"资源", u"心得",
-u"学好", u"交流", u"视频",u"教程",u"福音", u"心得", u"最热", u"教材", u"实战", u"进阶"]
-filter_authors = [u"qq191501000", u"飞凡5520", u"z7912846",u"啊贤哥仔"]
+filters = get_filters()
+filter_authors = get_blacklist()
 
 
 def get_total():
@@ -133,7 +150,7 @@ def get_detail(item):
     if get_topic(tid):
         update_db(tid, last_reply, response_num)
     else:
-        data = (tid,title,url,author,publish_time, response_num, last_reply)
+        data = (tid,title,url,author,publish_time, response_num, last_reply, "python")
         insert_db(data)
 
 
