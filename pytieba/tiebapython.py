@@ -13,16 +13,21 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+#path = "/var/local/"
+path = "./"
+
 logger = logging.getLogger(__name__)
 logger.setLevel(level = logging.INFO)
-handler = logging.FileHandler("/var/local/log.txt")
+handler = logging.FileHandler(path + "log.txt")
 handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+
+
 def create_db():
-    conn = sqlite3.connect('/var/local/python.db')
+    conn = sqlite3.connect(path + 'python.db')
     cursor = conn.cursor()
     sql = """
     CREATE TABLE IF NOT EXISTS topic(
@@ -43,7 +48,7 @@ def create_db():
     conn.close()
 
 def insert_db(data):
-    conn = sqlite3.connect('/var/local/python.db')
+    conn = sqlite3.connect(path + 'python.db')
     cursor = conn.cursor()
     sql = """
     INSERT INTO topic (id,title,url,author,publish_time, response_num, last_reply, keyword)
@@ -54,14 +59,14 @@ def insert_db(data):
     conn.close()
 
 def update_db(tid, last_reply, response_num):
-    conn = sqlite3.connect('/var/local/python.db')
+    conn = sqlite3.connect(path + 'python.db')
     c = conn.cursor()
     sql = "UPDATE topic set last_reply=?, response_num=?, update_time=datetime('now', 'localtime') where id=?"
     c.execute(sql, (last_reply, response_num, tid))
     conn.close()
 
 def get_topic(tid):
-    conn = sqlite3.connect('/var/local/python.db')
+    conn = sqlite3.connect(path + 'python.db')
     c = conn.cursor()
     cursor = c.execute("SELECT * FROM topic WHERE id=%s" % tid)
     conn.commit()
@@ -71,7 +76,7 @@ def get_topic(tid):
 
 def get_filters():
     words = []
-    fp = open("/var/local/stopwords.txt", "r")
+    fp = open(path + "stopwords.txt", "r")
     for line in fp:
         line = line.strip()
         words.append(line)
@@ -79,7 +84,7 @@ def get_filters():
 
 def get_blacklist():
     words = []
-    fp = open("/var/local/blacklist.txt", "r")
+    fp = open(path + "blacklist.txt", "r")
     for line in fp:
         line = line.strip()
         words.append(line)

@@ -34,9 +34,11 @@ def get_topic():
             "publish_time": row[4],
             "response_num": row[5],
             "last_reply": row[6],
-            "create_time": row[7],
-            "update_time": row[8]
+            "keyword": row[7],
+            "create_time": row[8],
+            "update_time": row[9]
         }
+        print(data)
         data_lst.append(data)
     return jsonify(data_lst)
 
@@ -52,4 +54,4 @@ def clear_all():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=3000)
