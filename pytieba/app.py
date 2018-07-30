@@ -13,7 +13,7 @@ def hello():
 
 @app.route("/topic")
 def get_topic():
-    conn = sqlite3.connect('python.db')
+    conn = sqlite3.connect('/var/local/python.db')
     cursor = conn.cursor()
     # total = 0
     # sql = "select count(*) from topic"
@@ -44,7 +44,7 @@ def get_topic():
 
 @app.route("/clear")
 def clear_all():
-    conn = sqlite3.connect('python.db')
+    conn = sqlite3.connect('/var/local/python.db')
     cursor = conn.cursor()
     sql = "delete from topic"
     c = cursor.execute(sql)
