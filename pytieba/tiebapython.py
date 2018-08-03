@@ -7,14 +7,20 @@ import random
 import requests
 import traceback
 import logging
+import smtplib
+from email.header import Header
+from email.mime.text import MIMEText
 from datetime import datetime
 from bs4 import BeautifulSoup
 import sys
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 #path = "/var/local/"
 path = "./"
+
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(level = logging.INFO)
@@ -24,6 +30,43 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+
+def sendEmail(title, content):
+    mail_host = "smtp.163.com"
+    mail_user = "allen_li89"
+    mail_pass = "8023@liuhui" 
+    sender = "allen_li89@163.com"
+    receivers = ["1591780418@qq.com"]
+    message = MIMEText(content, 'plain', 'utf-8')
+    message['From'] = "{}".format(sender)
+    message['To'] = ",".join(receivers)
+    message['Subject'] = title
+
+    try:
+        smtpObj = smtplib.SMTP_SSL(mail_host, 465)  # 启用SSL发信, 端口一般是465
+        smtpObj.login(mail_user, mail_pass)  # 登录验证
+        smtpObj.sendmail(sender, receivers, message.as_string())  # 发送
+        print("mail has been send successfully.")
+    except smtplib.SMTPException as e:
+        print(e)
+
+
+def has_sent(tid):
+    conn = sqlite3.connect(path + 'python.db')
+    c = conn.cursor()
+    cursor = c.execute("SELECT * FROM email WHERE topic_id=%s" % tid)
+    conn.commit()
+    row = cursor.fetchone()
+    conn.close()
+    return row is not None
+
+def record(tid):
+    conn = sqlite3.connect(path + 'python.db')
+    cursor = conn.cursor()
+    sql = "INSERT INTO email (topic_id) VALUES (%s)" % tid
+    cursor.execute(sql)
+    conn.commit()
+    conn.close()
 
 
 def create_db():
@@ -41,6 +84,13 @@ def create_db():
         keyword CHAR(50),
         create_time TIMESTAMP default (datetime('now', 'localtime')),
         update_time TIMESTAMP default (datetime('now', 'localtime'))
+    )
+    """
+    cursor.execute(sql)
+    sql = """
+    CREATE TABLE IF NOT EXISTS email(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id INT NOT NULL
     )
     """
     cursor.execute(sql)
@@ -143,6 +193,7 @@ def get_detail(item):
         if len(arr[0]) == 4:
             year = int(arr[0])
             month = int(arr[1])
+            day = 28
         else:
             month = int(arr[0])
             day = int(arr[1])
@@ -157,6 +208,11 @@ def get_detail(item):
     else:
         data = (tid,title,url,author,publish_time, response_num, last_reply, "python")
         insert_db(data)
+        keys = [u"作业", u"有偿", u"任务"]
+        for key in keys:
+            if key in title:
+                sendEmail(title, url)
+                break
 
 
 if __name__ == "__main__":
