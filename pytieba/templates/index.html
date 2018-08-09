@@ -18,12 +18,21 @@
 
 <body>
     <div class="main">
-        <div id="toolbar">
+        <div style="padding-top:8px;margin-bottom:-20px">
             <button id="clear" class="btn btn-danger">
                 Clear
             </button>
+            <button class="btn btn-primary btn-filter" data-key="all" id="all">All</button>
+            <button class="btn btn-primary btn-filter" data-key="python" id="python">Python</button>
+            <button class="btn btn-primary btn-filter" data-key="java">Java</button>
+            <button class="btn btn-primary btn-filter" data-key="python3">Python3</button>
+            <button class="btn btn-primary btn-filter" data-key="python爬虫">爬虫</button>
         </div>
-        <table class="table table-hover" data-pagination="true" data-page-size="15" data-search="true" data-toggle="table" data-url="/topic"  data-toolbar="#toolbar">
+        <div id="toolbar">
+            
+            
+        </div>
+        <table class="table table-hover" data-pagination="true" data-page-size="15" data-search="true" data-toggle="table">
             <thead>
                 <tr>
                     <th data-field="id">ID</th>
@@ -48,7 +57,19 @@
     <script type="text/javascript" src="static/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
     <script type="text/javascript">
         $(function(){
-            $("table").bootstrapTable();
+            $("button.btn-filter").click(function(){
+                var keyword = $(this).data("key");
+                $.ajax({
+                    url:"/topic?keyword=" + keyword,
+                    method:"GET",
+                    contentType:"application/json",
+                    success: function(res){
+                        $("table").bootstrapTable("destroy");
+                        $("table").bootstrapTable({"data": res});
+                    }
+                })
+            })
+            $("#python").trigger("click");
             $("#clear").click(function(){
                 $.ajax({
                     url:"/clear",

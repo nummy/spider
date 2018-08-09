@@ -13,6 +13,7 @@ def hello():
 
 @app.route("/topic")
 def get_topic():
+    keyword = request.args.get("keyword")
     conn = sqlite3.connect('/var/local/python.db')
     cursor = conn.cursor()
     # total = 0
@@ -20,7 +21,10 @@ def get_topic():
     # c = cursor.execute(sql)
     # total = c.fetchone()[0]
     # total = int(total)
-    sql = "select * from topic"
+    if keyword == "all":
+        sql = "select * from topic order by publish_time desc"
+    else:
+        sql = "select * from topic where keyword='%s' order by publish_time desc" % keyword
     c = cursor.execute(sql)
     rows = c.fetchall()
     conn.close()
@@ -38,7 +42,6 @@ def get_topic():
             "create_time": row[8],
             "update_time": row[9]
         }
-        print(data)
         data_lst.append(data)
     return jsonify(data_lst)
 
@@ -54,4 +57,4 @@ def clear_all():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=3000)
+    app.run(debug=True, host="0.0.0.0", port=5000)
