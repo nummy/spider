@@ -2,7 +2,7 @@ import glob
 from bs4 import BeautifulSoup
 
 def get_qq():
-    fp = open("qq.txt")
+    fp = open("my_qq.txt")
     qq_lst = []
     for line in fp:
         line = line.strip()
@@ -11,8 +11,8 @@ def get_qq():
 
 
 qq_lst = get_qq()
-filenames = glob.glob("*.html")
-output = open("result.txt", "w")
+filenames = glob.glob("IT技术编程群.html")
+output = open("result3.txt", "w")
 for filename in filenames:
     fp = open(filename, "r", encoding="utf-8")
     soup = BeautifulSoup(fp, "lxml")

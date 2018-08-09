@@ -155,8 +155,8 @@ def get_total():
     total = href[index+3:]
     return int(total)
 
-def get_page(index):
-    url = URL + "&pn=%s" % index
+def get_page(index, keyword):
+    url = "http://tieba.baidu.com/f?kw=%s&pn=%s" % (keyword, index)
     html = requests.get(url).content
     #html = open("a.html", "r", encoding="utf-8")
     soup = BeautifulSoup(html, "html.parser")
@@ -165,12 +165,12 @@ def get_page(index):
         url = None
         try:
             url = item.find(class_="threadlist_title").find("a").attrs["href"].strip()
-            get_detail(item)
+            get_detail(item, keyword)
         except Exception as e:
             logger.error(u"链接:%s, 错误原因：%s" % (url, str(e)))
             traceback.print_exc()
 
-def get_detail(item):
+def get_detail(item, keyword):
     url = item.find(class_="threadlist_title").find("a").attrs["href"].strip()
     tid = url.split("/")[2]
     url = "http://tieba.baidu.com%s" % url
@@ -206,12 +206,15 @@ def get_detail(item):
     if get_topic(tid):
         update_db(tid, last_reply, response_num)
     else:
-        data = (tid,title,url,author,publish_time, response_num, last_reply, "python")
+        data = (tid,title,url,author,publish_time, response_num, last_reply, keyword)
         insert_db(data)
         keys = [u"作业", u"有偿", u"任务"]
         for key in keys:
             if key in title:
-                sendEmail(title, url)
+                if not has_sent(tid):
+                    print("record" +  str(tid))
+                    record(tid)
+                    #sendEmail(title, url)
                 break
 
 
