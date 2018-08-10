@@ -1,5 +1,5 @@
-fp = open("result2.txt")
-output = open("todo2.txt", "w")
+fp = open("result4.txt")
+output = open("todo4.txt", "w")
 counter = 0
 emails = [] 
 for line in fp:

@@ -226,5 +226,6 @@ if __name__ == "__main__":
         get_page(i*50, "python3")
         get_page(i*50, "java")
         get_page(i*50, u"python爬虫")
+        get_page(i*50, u"r语言")
     time = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M")
     logger.info(u"调度结束时间:%s" % time)
