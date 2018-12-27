@@ -12,7 +12,7 @@ def get_qq():
 
 qq_lst = get_qq()
 filenames = glob.glob("IT技术编程群.html")
-output = open("result3.txt", "w")
+output = open("result.txt", "w", encoding="utf-8")
 for filename in filenames:
     fp = open(filename, "r", encoding="utf-8")
     soup = BeautifulSoup(fp, "lxml")
@@ -23,6 +23,6 @@ for filename in filenames:
         qq = tr.select("td")[4].text.strip()
         year = tr.select("td")[6].text.strip("年")
         if qq not in qq_lst:
-            output.write(qq + "\n")
+            output.write(qq + ":" + nickname + "\n")
 output.close()
         
